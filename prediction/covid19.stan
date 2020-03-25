@@ -1,6 +1,7 @@
 data {
   int<lower=0> T; // Time horizon
   int<lower=0> N; // Number of countries
+  int<lower=1> L; // Delay
   matrix<lower=0>[T, N] S; // Cummulative infection
   matrix<lower=0>[T, N] R; // Recovered
 }
@@ -25,8 +26,8 @@ model {
           c[i, j] ~ gamma(c_alpha[i, j], c_beta[i, j]);
       };
     };
-    for (t in 2:T){
-      S[t] ~ normal(S[t-1] + (S[t-1] - R[t-1]) * c .* (1 - S[t-1]./to_row_vector(p)), sigma_S);
+    for (t in L+1:T){
+      S[t] ~ normal(S[t-1] + (S[t-L] - R[t-L]) * c .* (1 - S[t-L]./to_row_vector(p)), sigma_S);
       R[t] ~ normal(R[t-1] + a * (S[t-1] - R[t-1]), sigma_R);
   }
 }
