@@ -15,8 +15,8 @@ parameters {
   real<lower=0> a_alpha; // Recovery rate
   real<lower=0> a_beta;
   real<lower=0, upper=1> a;
-  real<lower=0> sigma_S; // noise factor for the cumulative infection
-  real<lower=0> sigma_R; // noise factor for the recorvery
+  vector<lower=0>[N] sigma_S; // noise factor for the cumulative infection
+  vector<lower=0>[N] sigma_R; // noise factor for the recorvery
 }  
 model {
     a ~ beta(a_alpha, a_beta);
