@@ -37,7 +37,6 @@ parameters {
     real<lower=0> theta_q_beta;
     real<lower=0> theta_q;
     real<lower=0> q_date;
-    real<lower=0> sigma_S; // noise factor for the susceptibles
     real<lower=0> sigma_I; // noise factor for the infected
     real<lower=0> sigma_I0; // observation error for C;
     real<lower=0> sigma_R0; // observation error for R;

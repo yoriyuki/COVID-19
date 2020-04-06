@@ -15,12 +15,13 @@ parameters {
   real<lower=0> a_alpha; // Recovery rate
   real<lower=0> a_beta;
   real<lower=0, upper=1> a;
-  vector<lower=0>[N] sigma_S; // noise factor for the cumulative infection
-  vector<lower=0>[N] sigma_R; // noise factor for the recorvery
+  vector<lower=0>[N] sigma_b; //noise on infection rate
+  vector<lower=0>[N] sigma_S; //observation error on S
+  vector<lower=0>[N] sigma_R; //observation error on R
 }  
 model {
-    a ~ beta(a_alpha, a_beta);
     p ~ gamma(p_alpha, p_beta);
+    a ~ beta(a_alpha, a_beta);
     for (i in 1:N) {
       for (j in 1:N) {
           c[i, j] ~ gamma(c_alpha[i, j], c_beta[i, j]);
