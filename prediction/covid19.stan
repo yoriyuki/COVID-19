@@ -12,9 +12,9 @@ parameters {
   vector<lower=0>[N] p_alpha; // Effective population
   vector<lower=0>[N] p_beta;
   vector<lower=0>[N] p;
-  real<lower=0> a_alpha; // Recovery rate
-  real<lower=0> a_beta;
-  real<lower=0, upper=1> a;
+  vector<lower=0>[N] a_alpha; // Recovery rate
+  vector<lower=0>[N] a_beta;
+  vector<lower=0, upper=1>[N] a;
   vector<lower=0>[N] sigma_S; // noise factor for the cumulative infection
   vector<lower=0>[N] sigma_R; // noise factor for the recorvery
 }  
@@ -28,6 +28,6 @@ model {
     };
     for (t in L+1:T){
       S[t] ~ normal(S[t-1] + (S[t-L] - R[t-L]) * c .* (1 - S[t-L]./to_row_vector(p)), sigma_S);
-      R[t] ~ normal(R[t-1] + a * (S[t-1] - R[t-1]), sigma_R);
+      R[t] ~ normal(R[t-1] + to_row_vector(a) .* (S[t-1] - R[t-1]), sigma_R);
   }
 }
