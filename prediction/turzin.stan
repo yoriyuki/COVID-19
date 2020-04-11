@@ -1,80 +1,55 @@
 data {
-    int<lower=0> T; // Time horizon
-    int<lower=0> N; // Population
-    vector<lower=0>[T] I0; // observed infected 
-    vector<lower=0>[T] R0; // observed recovery
-    vector<lower=0>[T] D; // Death
+  int<lower=0> T; // Time horizon
+  int<lower=0> P; // Population
+  vector<lower=0>[T] S0; // Cummulative infection
+  vector<lower=0>[T] R0; // Recovered
+  vector<lower=0>[T] D0; // Cummulative death
+
 }
 parameters {
-    real<lower=0> l0_alpha; // Initial infection
-    real<lower=0> l0_beta;
-    real<lower=10> l0;
-    real<lower=0> beta0_alpha; // transmission rate at t=0
-    real<lower=0> beta0_beta;
-    real<lower=0> beta0;
-    real<lower=0> beta1_alpha; // transmission rate at t=inf
-    real<lower=0> beta1_beta;
-    real<lower=0> beta1;
-    real<lower=0> b_date; // startig date of intervention
-    real<lower=0> theta_alpha; //steepness of intervention logistic curve
-    real<lower=0> theta_beta;
-    real<lower=0> theta;
-    real<lower=0> gamma_alpha; // recovery rate
-    real<lower=0> gamma_beta;
-    real<lower=0, upper=1> gamma;
-    real<lower=0> delta_alpha; // death rate
-    real<lower=0> delta_beta;
-    real<lower=0, upper=1> delta;
-    real<lower=0> q1_alpha; //initial detection rate
-    real<lower=0> q1_beta;
-    real<lower=0, upper=1> q1;
-    real<lower=0> q2_alpha; //final detection rate
-    real<lower=0> q2_beta;
-    real<lower=0, upper=1> q2;
-    real<lower=0> theta_q_alpha; //steepness of logistic curve
-    real<lower=0> theta_q_beta;
-    real<lower=0> theta_q;
-    real<lower=0> q_date;
-    real<lower=0> sigma_I; // noise factor for the infection
-    real<lower=0> sigma_R; // noise factor for recovery
-    real<lower=0> sigma_D; // noise factor for death
-    real<lower=0> sigma_I0; // observation error for I0
-    real<lower=0> sigma_R0; // observation error for R;
-    vector<lower=0>[T] S; // real cummulative infection
-    vector<lower=0>[T] I; // real infected
-    vector<lower=0>[T] R; // real recovered
-    vector<lower=0>[T] b;
-    vector<lower=0, upper=1>[T] q;
-    vector<lower=0>[T] NI;
-    vector<lower=0>[T] NR;
-    vector<lower=0>[T] ND;
+  vector<lower=0, upper=P>[T] S; // real cummulative infection
+  vector<lower=0, upper=P>[T] R; // real recovered
+  real<lower=0> b_alpha; // growth rate
+  real<lower=0> b_beta;
+  real<lower=0> b;
+  real<lower=0> q_alpha; // detection rate
+  real<lower=0> q_beta;
+  real<lower=0, upper=1> q;
+  real<lower=0> a_alpha; // Recovery rate
+  real<lower=0> a_beta;
+  real<lower=0, upper=1> a;
+  real<lower=0> d_alpha; // Death rate
+  real<lower=0> d_beta;
+  real<lower=0, upper=1> d;
+  real<lower=0> sigma_S_alpha;
+  real<lower=0> sigma_S_beta;
+  real<lower=0> sigma_S; // noise factor for cumulative infection
+  real<lower=0> sigma_R_alpha;
+  real<lower=0> sigma_R_beta;
+  real<lower=0> sigma_R; // noise factor for recorvery
+  real<lower=0> sigma_D_alpha;
+  real<lower=0> sigma_D_beta;
+  real<lower=0> sigma_D; // noise factor for death
+  real<lower=0> sigma_S0_alpha;
+  real<lower=0> sigma_S0_beta;
+  real<lower=0> sigma_S0; // observation error for cumulative infection
+  // real<lower=0> sigma_R0; // noise factor for detected recorvery
 }  
 model {
-    l0 ~ gamma(l0_alpha, l0_beta);
-    beta0 ~ gamma(beta0_alpha, beta0_beta);
-    beta1 ~ gamma(beta1_alpha, beta1_beta);
-    b_date ~ uniform(0, T);
-    theta ~ gamma(theta_alpha, theta_beta);
-    gamma ~ beta(gamma_alpha, gamma_beta);
-    delta ~ beta(delta_alpha, delta_beta);
-    q1 ~ beta(q1_alpha, q1_beta);
-    q2 ~ beta(q2_alpha, q2_beta);
-    theta_q ~ gamma(theta_q_alpha, theta_q_beta);
-    q_date ~ uniform(0, T);
-    S[1] ~ normal(N, 0.1);
-    I[1] ~ normal(l0, sigma_I);
-
+    a ~ beta(a_alpha, a_beta);
+    d ~ beta(d_alpha, d_beta);
+    b ~ gamma(b_alpha, b_beta);
+    q ~ beta(q_alpha, q_beta);
+    sigma_S ~ gamma(sigma_S_alpha, sigma_S_beta);
+    sigma_R ~ gamma(sigma_R_alpha, sigma_R_beta);
+    sigma_D ~ gamma(sigma_D_alpha, sigma_D_beta);
+    sigma_S0 ~ gamma(sigma_S0_alpha, sigma_S0_beta);
+    
     for (t in 2:T){
-        b[t] ~ normal(beta0 + (beta1 - beta0) * 1 / (1 + exp(-theta * (t - b_date))), 0.01); // transmission rate
-        q[t] ~ normal(q1 + (q2 - q1) * 1 / (1 + exp(-theta_q * (t - q_date))), 0.01); // observation rate
-        NI[t] ~ normal(b * S[t-1] * I[t-1] / N, sigma_I);
-        NR[t] ~ normal(gamma * I[t-1], sigma_R);
-        ND[t] ~ normal(delta * I[t-1], sigma_D);
-        D[t] ~ normal(D[t-1] + ND[t], 0.1);
-        S[t]  ~ normal(S[t-1] - NI[t], 0.1);
-        I[t]  ~ normal(I[t-1] + NI[t] - NR[t] - ND[t], 0.1);
-        R[t] ~ normal(R[t-1] + NR[t], 0.1);
-        I0[t] ~ normal(q * I[t], sigma_I0);
-        R0[t] ~ normal(q * R[t], sigma_R0);
+      S[t] ~ normal(S[t-1] + (S[t-1] - R[t-1] - D0[t-1]) * b * (1 - S[t-1]/P), sigma_S);
+      R[t] ~ normal(R[t-1] + a * (S[t-1] - R[t-1] - D0[t-1]), sigma_R);
+      D0[t] ~ normal(D0[t-1] + d * (S[t-1] - R[t-1] - D0[t-1]), sigma_D);
+      S0[t] ~ normal(q * S[t], sigma_S0);
+      R0[t] ~ normal(a * S0[t], 1);
   }
 }
