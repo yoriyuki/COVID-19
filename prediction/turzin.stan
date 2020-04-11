@@ -41,11 +41,13 @@ parameters {
     real<lower=0> sigma_I0; // observation error for I0
     real<lower=0> sigma_R0; // observation error for R;
     vector<lower=0>[T] S; // real cummulative infection
-    vector<lower=0>[T] I;
-    real<lower=0> b;
-    real<lower=0, upper=1> q;
-    real<lower=0> NI;
-    real<lower=0> R;
+    vector<lower=0>[T] I; // real infected
+    vector<lower=0>[T] R; // real recovered
+    vector<lower=0>[T] b;
+    vector<lower=0, upper=1>[T] q;
+    vector<lower=0>[T] NI;
+    vector<lower=0>[T] NR;
+    vector<lower=0>[T] ND;
 }  
 model {
     l0 ~ gamma(l0_alpha, l0_beta);
@@ -61,19 +63,18 @@ model {
     q_date ~ uniform(0, T);
     S[1] ~ normal(N, 0.1);
     I[1] ~ normal(l0, sigma_I);
-    D[1] ~ normal(0, 0.1);
-    I0[1] ~ normal(0, 0.1);
-    R0[1] ~ normal(0, 0.1);
 
     for (t in 2:T){
-        b ~ normal(beta0 + (beta1 - beta0) * 1 / (1 + exp(-theta * (t - b_date))), 0.01); // transmission rate
-        q ~ normal(q1 + (q2 - q1) * 1 / (1 + exp(-theta_q * (t - q_date))), 0.01); // observation rate
-        NI ~ normal(b * S[t-1] * I[t-1] / N, sigma_I);
-        R ~ normal(gamma * I[t-1], sigma_R);
-        D[t] ~ normal(delta * I[t-1], sigma_D);
-        S[t]  ~ normal(S[t-1] - NI, 0.1);
-        I[t]  ~ normal(I[t-1] + NI - R - D[t], 0.1) ;
+        b[t] ~ normal(beta0 + (beta1 - beta0) * 1 / (1 + exp(-theta * (t - b_date))), 0.01); // transmission rate
+        q[t] ~ normal(q1 + (q2 - q1) * 1 / (1 + exp(-theta_q * (t - q_date))), 0.01); // observation rate
+        NI[t] ~ normal(b * S[t-1] * I[t-1] / N, sigma_I);
+        NR[t] ~ normal(gamma * I[t-1], sigma_R);
+        ND[t] ~ normal(delta * I[t-1], sigma_D);
+        D[t] ~ normal(D[t-1] + ND[t], 0.1);
+        S[t]  ~ normal(S[t-1] - NI[t], 0.1);
+        I[t]  ~ normal(I[t-1] + NI[t] - NR[t] - ND[t], 0.1);
+        R[t] ~ normal(R[t-1] + NR[t], 0.1);
         I0[t] ~ normal(q * I[t], sigma_I0);
-        R0[t] ~ normal(q * R, sigma_R0);
+        R0[t] ~ normal(q * R[t], sigma_R0);
   }
 }
