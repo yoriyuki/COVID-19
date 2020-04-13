@@ -67,7 +67,7 @@ model {
     C = 0;
     
     for (t in 2:T){
-      b = b0 - (b1 - b0) * inv_logit(theta_b * (t - b_date));
+      b = b0 + (b1 - b0) * inv_logit(theta_b * (t - b_date));
       NI = I * b * (1 - C/P);
       q = q1 * inv_logit(theta_q * (t - q_date));
       NR = a * I;
@@ -77,7 +77,7 @@ model {
       C = C + NI;
       R = R + NR;
       C0[t] - C0[t-1] ~ poisson(q * NI);
-      D0[t] - D0[t-1] ~ poisson(ND);   
+      D0[t] - D0[t-1] ~ poisson(d * (C0[t-1] - R0[t-1] - D0[t-1]));   
       R0[t] - R0[t-1] ~ poisson(a * (C0[t-1] - R0[t-1] - D0[t-1]));
   }
 }
