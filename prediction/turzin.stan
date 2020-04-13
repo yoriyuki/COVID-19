@@ -20,9 +20,9 @@ parameters {
   real<lower=0> theta_b_beta;
   real<lower=0> theta_b;
   real<lower=0, upper=T> b_date;
-  real<lower=0> q0_alpha; // initial detection rate
-  real<lower=0> q0_beta;
-  real<lower=0, upper=1> q0;
+//  real<lower=0> q0_alpha; // initial detection rate
+//  real<lower=0> q0_beta;
+//  real<lower=0, upper=1> q0;
   real<lower=0> q1_alpha; // final detection rate
   real<lower=0> q1_beta;
   real<lower=0, upper=1> q1;
@@ -55,7 +55,6 @@ model {
     theta_b ~ gamma(theta_b_alpha, theta_b_beta);
     b_date ~ uniform(0, T);
 
-    q0 ~ beta(q0_alpha, q0_beta);
     q1 ~ beta(q1_alpha, q1_beta);
     theta_q ~ gamma(theta_q_alpha, theta_q_beta);
     q_date ~ uniform(0, T);
@@ -68,7 +67,7 @@ model {
     for (t in 2:T){
       b = b0 + (b1-b0) * inv_logit(theta_b * (t - b_date));
       I = (S - R - D) * b * (1 - S/P);
-      q = q0 + (q1-q0) * inv_logit(theta_q * (t - q_date));
+      q = q1 * inv_logit(theta_q * (t - q_date));
       NR = a * (S - R - D);
       ND = d * (S - R - D);
       D = D + ND;
