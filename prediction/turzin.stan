@@ -23,8 +23,8 @@ parameters {
 //  real<lower=0> q0_alpha; // initial detection rate
 //  real<lower=0> q0_beta;
 //  real<lower=0, upper=1> q0;
-  real<lower=0> q1_alpha; // final detection rate
-  real<lower=0> q1_beta;
+  real<lower=1> q1_alpha; // final detection rate
+  real<lower=1> q1_beta;
   real<lower=0, upper=1> q1;
   real<lower=0> theta_q_alpha; // curve steepness
   real<lower=0> theta_q_beta;
