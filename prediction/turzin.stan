@@ -19,7 +19,14 @@ parameters {
   real<lower=0> theta_b_alpha; // curve steepness
   real<lower=0> theta_b_beta;
   real<lower=0> theta_b;
+  real<lower=0> b2_alpha; // final growth rate
+  real<lower=0> b2_beta;
+  real<lower=0> b2;
+  real<lower=0> theta_b2_alpha; // curve steepness
+  real<lower=0> theta_b2_beta;
+  real<lower=0> theta_b2;
   real<lower=0, upper=T> b_date;
+  real<lower=0, upper=T> b2_date;
   real<lower=0> q0_alpha; // initial detection rate
   real<lower=0> q0_beta;
   real<lower=0, upper=1> q0;
@@ -30,6 +37,13 @@ parameters {
   real<lower=0> theta_q_beta;
   real<lower=0> theta_q;
   real<lower=0, upper=T> q_date;
+  real<lower=0> q2_alpha; // final detection rate
+  real<lower=0> q2_beta;
+  real<lower=0, upper=1> q2;
+  real<lower=0> theta_q2_alpha; // curve steepness
+  real<lower=0> theta_q2_beta;
+  real<lower=0> theta_q2;
+  real<lower=0, upper=T> q2_date;
 
   real<lower=0> a_alpha; // Recovery rate
   real<lower=0> a_beta;
@@ -52,13 +66,19 @@ model {
 
     b0 ~ gamma(b0_alpha, b0_beta);
     b1 ~ gamma(b1_alpha, b1_beta);
+    b2 ~ gamma(b2_alpha, b2_beta);
     theta_b ~ gamma(theta_b_alpha, theta_b_beta);
+    theta_b2 ~ gamma(theta_b2_alpha, theta_b2_beta);
     b_date ~ uniform(0, T);
+    b2_date ~ uniform(b_date, T);
 
     q0 ~ beta(q0_alpha, q0_beta);
     q1 ~ beta(q1_alpha, q1_beta);
     theta_q ~ gamma(theta_q_alpha, theta_q_beta);
     q_date ~ uniform(0, T);
+    q2 ~ beta(q2_alpha, q2_beta);
+    theta_q2 ~ gamma(theta_q_alpha, theta_q_beta);
+    q2_date ~ uniform(q_date, T);
 
     init_inf ~ gamma(init_inf_alpha, init_inf_beta);
     S = init_inf;
@@ -66,9 +86,9 @@ model {
     D = 0;
     
     for (t in 2:T){
-      b = b0 + (b1-b0) * inv_logit(theta_b * (t - b_date));
+      b = b0 + (b1-b0) * inv_logit(theta_b * (t - b_date)) + (b2 - b1) * inv_logit(theta_b2 * (t - b2_date));
       I = (S - R - D) * b * (1 - S/P);
-      q = q0 + (q1-q0) * inv_logit(theta_q * (t - q_date));
+      q = q0 + (q1-q0) * inv_logit(theta_q * (t - q_date)) + (q2-q1) * inv_logit(theta_q2 * (t - q2_date));
       NR = a * (S - R - D);
       ND = d * (S - R - D);
       D = D + ND;
