@@ -28,7 +28,6 @@ functions{
 parameters {
   real<lower=0> init_inf;
   real<lower=0> b;
-  real<lower=0, upper=1> q;
   real<lower=0, upper=1> a;
   real<lower=0, upper=1> d;
   }
