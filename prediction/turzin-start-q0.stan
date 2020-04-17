@@ -60,20 +60,20 @@ transformed parameters {
 }
 model {
     a ~ beta(0.1, 1);
-    d ~ beta(5, 1000);
+    d ~ beta(0.01, 1);
 
     b0 ~ gamma(0.1, 1);
     b1 ~ gamma(0.1, 1);
-    theta_b ~ gamma(1, 2);
+    theta_b ~ gamma(1, 1);
     b_date ~ uniform(0, T);
 
     q0 ~ beta(1, 1);
     q1 ~ beta(1, 1);
-    theta_q ~ gamma(1, 2);
+    theta_q ~ gamma(1, 1);
     q_date ~ uniform(0, T);
 
     init_inf ~ gamma(1, 1);
-    C0[1] ~ poisson(init_inf);
+    C0[1] ~ poisson(q[1] * init_inf);
     for (t in 1:T-1){
       C0[t+1] - C0[t] ~ poisson(q[t] * NI[t]);
       D0[t+1] - D0[t] ~ poisson(d * (C0[t] - R0[t] - D0[t]));   

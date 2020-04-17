@@ -38,15 +38,14 @@ parameters {
 }
 model {
     a ~ beta(0.1, 1);
-    d ~ beta(5, 1000);
-    q ~ beta(1, 2);
+    d ~ beta(0.001, 1);
 
     b ~ gamma(0.1, 1);
 
     init_inf ~ gamma(1, 1);
     C0[1] ~ poisson(init_inf);
     for (t in 1:T-1){
-      C0[t+1] - C0[t] ~ poisson(q * NI[t]);
+      C0[t+1] - C0[t] ~ poisson(NI[t]);
       D0[t+1] - D0[t] ~ poisson(d * (C0[t] - R0[t] - D0[t]));   
       R0[t+1] - R0[t] ~ poisson(a * (C0[t] - R0[t] - D0[t]));
     }
@@ -55,6 +54,6 @@ generated quantities {
   vector[T] log_lik;
   
   for (t in 1:T-1) {
-    log_lik[t] = poisson_lpmf(C0[t+1] - C0[t] | q * NI[t]);
+    log_lik[t] = poisson_lpmf(C0[t+1] - C0[t] | NI[t]);
   }
 }
