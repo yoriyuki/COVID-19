@@ -39,8 +39,8 @@ model {
     theta_b ~ gamma(1, 2);
     b_date ~ uniform(0, T);
 
-    q0 ~ beta(1, 2);
-    q1 ~ beta(1, 2);
+    q0 ~ beta(1, 1);
+    q1 ~ beta(1, 1);
     theta_q ~ gamma(1, 2);
     q_date ~ uniform(0, T);
 
