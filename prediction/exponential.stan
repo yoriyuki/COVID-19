@@ -36,10 +36,10 @@ parameters {
   NI = ni(a, d, b, init_inf, T);
 }
 model {
-    a ~ beta(0.1, 1);
-    d ~ beta(0.001, 1);
+    a ~ beta(1, 1);
+    d ~ beta(1, 1);
 
-    b ~ gamma(0.1, 1);
+    b ~ gamma(1, 1);
 
     init_inf ~ gamma(1, 1);
     C0[1] ~ poisson(init_inf);

@@ -59,11 +59,11 @@ transformed parameters {
   NI = ni(a, d, b0, b1, theta_b, b_date, init_inf, P, T);
 }
 model {
-    a ~ beta(0.1, 1);
-    d ~ beta(0.01, 1);
+    a ~ beta(1, 1);
+    d ~ beta(1, 1);
 
-    b0 ~ gamma(0.1, 1);
-    b1 ~ gamma(0.1, 1);
+    b0 ~ gamma(1, 1);
+    b1 ~ gamma(1, 1);
     theta_b ~ gamma(1, 1);
     b_date ~ uniform(0, T);
 
