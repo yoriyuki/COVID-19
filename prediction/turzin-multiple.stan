@@ -35,6 +35,7 @@ data {
   int C0[T]; // Cummulative infection
   int R0[T]; // Recovered
   int D0[T]; // Cummulative death
+  real ED; // Emergency Declaration
 
 }
 parameters {
@@ -71,19 +72,19 @@ model {
 
     b0 ~ gamma(0.1, 1);
     b1 ~ gamma(0.1, 1);
-    theta_b ~ gamma(2, 1);
-    b_date ~ uniform(0, T-7);
+    theta_b ~ gamma(5, 1);
+    b_date ~ uniform(0, T);
     b2 ~ gamma(0.1, 1);
-    theta_b2 ~ gamma(2, 1);
-    b2_date ~ uniform(q_date+7, T);
+    theta_b2 ~ gamma(5, 1);
+    b2_date ~ uniform(b_date, T);
 
     q0 ~ beta(1, 1);
     q1 ~ beta(1, 1);
-    theta_q ~ gamma(2, 1);
-    q_date ~ uniform(0, T-7);
+    theta_q ~ gamma(5, 1);
+    q_date ~ uniform(0, T);
     q2 ~ beta(1, 1);
-    theta_q2 ~ gamma(2, 1);
-    q2_date ~ uniform(q_date+7, T);
+    theta_q2 ~ gamma(5, 1);
+    q2_date ~ uniform(q_date, T);
 
     init_inf ~ gamma(1, 1);
     C0[1] ~ poisson(q[1] * init_inf);
@@ -94,7 +95,7 @@ model {
     }
 }
 generated quantities {
-  vector[T] log_lik;
+  vector[T-1] log_lik;
   
   for (t in 1:T-1) {
     log_lik[t] = poisson_lpmf(C0[t+1] - C0[t] | q[t] * NI[t]);

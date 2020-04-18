@@ -81,7 +81,7 @@ model {
     }
 }
 generated quantities {
-  vector[T] log_lik;
+  vector[T-1] log_lik;
   
   for (t in 1:T-1) {
     log_lik[t] = poisson_lpmf(C0[t+1] - C0[t] | q[t] * NI[t]);
