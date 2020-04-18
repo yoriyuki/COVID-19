@@ -16,7 +16,7 @@ functions{
     D = 0;
     C = 0;
     for (t in 1:T-1){
-      b = b0 + (b1 - b0) * inv_logit(theta_b * (t - b_date));
+      b = b0 + (b1 - b0) / inv_logit(theta_b * (T - b_date)) * inv_logit(theta_b * (t - b_date));
       NI[t] = I * b * (1 - C/P);
       NR = a * I;
       ND = d * I;
@@ -54,7 +54,7 @@ transformed parameters {
   vector[T-1] NI;
   vector[T-1] q;
    for (t in 1:T-1){
-    q[t] = q0 + (q1 - q0) * inv_logit(theta_q * (t - q_date));
+    q[t] = q0 + (q1 - q0) / inv_logit(theta_q * (T - q_date)) * inv_logit(theta_q * (t - q_date));
   }
   NI = ni(a, d, b0, b1, theta_b, b_date, init_inf, P, T);
 }
